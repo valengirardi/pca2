@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 st.title("Gráfico PCA")
 
 # Cargar los datos desde el archivo Excel
-file_path = "PCA.xlsx"
+file_path = "PCA.xlsx"  # Asegúrate de que el archivo esté presente en el repositorio
 
 try:
     # Leer el archivo Excel
@@ -29,50 +29,37 @@ try:
     projected_df = pd.DataFrame(data=projected_data, columns=[f'PC{i}' for i in range(1, 4)])
     projected_df['type-of-reactor'] = data.index
 
-    # Normalizar valores de 'type-of-reactor'
-    projected_df['type-of-reactor'] = projected_df['type-of-reactor'].str.strip().str.lower()
-
-    # Diccionario de colores ajustado según los valores en tu archivo
-    color_map = {
-        'r1': '#ffbf50',
-        'r3-1': '#c7519c',
-        'r3-2': '#bcbd22',
-        'r3-3': '#1283b2'
+    # Definir colores específicos para ciertos puntos
+    custom_colors = {
+        "R3-1": "#ffbf50",
+        "R3-2": "#c7519c",
+        "R3-3": "#bcbd22",
+        "R1": "#1283b2"
     }
 
-    # Mapear colores
-    projected_df['color'] = projected_df['type-of-reactor'].map(color_map)
-
-    # Revisar registros con color faltante
-    missing_colors = projected_df[projected_df['color'].isna()]
-    if not missing_colors.empty:
-        st.error("Hay registros con tipos de reactor no mapeados. Por favor revisa:")
-        st.write(missing_colors)
+    # Crear una lista de colores basada en el tipo de reactor
+    colors = [
+        custom_colors.get(row['type-of-reactor'], '#cccccc')  # Color por defecto gris si no está en el diccionario
+        for _, row in projected_df.iterrows()
+    ]
 
     # Crear un objeto go.Figure
     fig = go.Figure()
 
-    # Añadir los puntos al gráfico con etiquetas (cartelitos)
-    for reactor_type, color in color_map.items():
-        subset = projected_df[projected_df['type-of-reactor'] == reactor_type]
-        fig.add_trace(go.Scatter3d(
-            x=subset['PC1'],
-            y=subset['PC2'],
-            z=subset['PC3'],
-            mode='markers+text',
-            marker=dict(size=5, color=color, opacity=0.8),
-            text=subset['type-of-reactor'],  # Cartelitos con el valor del punto
-            textposition='top center',
-            textfont=dict(size=10, color='white', family='Arial Black'),
-            name=reactor_type
-        ))
+    # Añadir los puntos al gráfico
+    fig.add_trace(go.Scatter3d(
+        x=projected_df['PC1'],
+        y=projected_df['PC2'],
+        z=projected_df['PC3'],
+        mode='markers+text',
+        marker=dict(size=4, color=colors, opacity=0.8),
+        text=projected_df['type-of-reactor'],
+        textposition='top center',
+        textfont=dict(size=8, color=colors),  # Aplicar los mismos colores a las etiquetas
+        name='Samples'
+    ))
 
-    # Escalar la matriz de cargas (loadings) para visualización
-    loadings = pca.components_.T  # Matriz de componentes principales
-    scaler = MinMaxScaler(feature_range=(-7.5, 7.5))
-    loadings_scaled = scaler.fit_transform(loadings)
-
-    # Lista de variables a mostrar en los vectores
+    # Lista de variables a filtrar
     variables_to_keep = [
         'pH',
         'Sulfide concentration',
@@ -83,9 +70,46 @@ try:
         'Methane in biogas (%)',
         'Carbon dioxide in biogas (%)',
         'Biogas volume',
+        'Uncultured (Family: Eubacteriaceae)',
+        'Uncultured (Family: Anaerolineaceae)',
+        'Aminobacterium',
+        'Sporanaerobacter',
+        'Syntrophomonas',
+        'Syner-01',
+        'Bacteroidetes_vadinHA17',
+        'Christensenellaceae_R-7_group',
+        'EBM-39',
+        'Sphaerochaeta',
+        'Proteiniphilum',
+        'Thermovirga',
+        'Pseudoramibacter',
+        'Dethiosulfovibrio',
+        'SEEP-SRB1',
+        'Uncultured (Family: Desulfobacteraceae)',
+        'Desulfobulbus',
+        'Desulfobotulus',
+        'Desulfomicrobium',
+        'Desulfocurvus',
+        'Desulfuromonas',
+        'Methanobrevibacter',
+        'Methanospirillum',
+        'Candidatus_Methanoplasma',
+        'Methanobacterium',
+        'Methanoculleus',
+        'Methanocalculus',
+        'RumEn_M2',
+        'Methanimicrococcus',
     ]
 
-    # Diccionario opcional para renombrar etiquetas
+    # Filtrar las variables a mantener
+    filtered_columns = [col for col in data.columns if col in variables_to_keep]
+
+    # Escalar la matriz de cargas (loadings) para visualización
+    loadings = pca.components_.T  # Cargar la matriz de componentes principales
+    scaler = MinMaxScaler(feature_range=(-7.5, 7.5))
+    loadings_scaled = scaler.fit_transform(loadings)
+
+    # Diccionario para renombrar las etiquetas (opcional)
     label_mapping = {
         "Amount of Fe (instantáneo)": "Iron added",
         "Sulfide concentration": "S²⁻ concentration",
@@ -96,22 +120,46 @@ try:
         "S input per day": "S input"
     }
 
-    # Agregar vectores de carga (loadings) con etiquetas
-    for i, variable in enumerate(data.columns):
-        if variable in variables_to_keep:
-            vector = loadings_scaled[i, :]  # Obtener el vector escalado
-            fig.add_trace(go.Scatter3d(
-                x=[0, vector[0]],
-                y=[0, vector[1]],
-                z=[0, vector[2]],
-                mode='lines+text',
-                line=dict(color='purple', width=1.5),
-                text=[None, label_mapping.get(variable, variable)],  # Etiqueta al final del vector
-                textposition='top center',
-                textfont=dict(size=8, color='purple'),
-                name=label_mapping.get(variable, variable),
-                showlegend=False
-            ))
+    # Agregar los vectores de carga (loadings) con leyenda seleccionable y etiquetas
+    for i, variable in enumerate(filtered_columns):
+        vector = loadings_scaled[data.columns.get_loc(variable), :]  # Obtener el vector escalado
+
+        # Dibujar los vectores como líneas
+        fig.add_trace(go.Scatter3d(
+            x=[0, vector[0]],
+            y=[0, vector[1]],
+            z=[0, vector[2]],
+            mode='lines',
+            line=dict(color='purple', width=1.5),
+            name=label_mapping.get(variable, variable),  # Usar el nombre mapeado o el original
+            legendgroup=variable,  # Usar el mismo grupo para líneas y texto
+            showlegend=True
+        ))
+
+        # Dibujar la punta del vector
+        fig.add_trace(go.Scatter3d(
+            x=[vector[0]],
+            y=[vector[1]],
+            z=[vector[2]],
+            mode='markers',
+            marker=dict(size=3, color='purple', symbol='circle', opacity=0.8),
+            name=label_mapping.get(variable, variable),  # Usar el nombre mapeado o el original
+            legendgroup=variable,  # Usar el mismo grupo para líneas y texto
+            showlegend=False
+        ))
+
+        # Añadir el nombre del vector en la punta
+        fig.add_trace(go.Scatter3d(
+            x=[vector[0]],
+            y=[vector[1]],
+            z=[vector[2]],
+            mode='text',
+            text=[label_mapping.get(variable, variable)],  # Usar el nombre mapeado o el original
+            textposition='top left',
+            textfont=dict(size=10),
+            legendgroup=variable,  # Usar el mismo grupo para líneas y texto
+            showlegend=False
+        ))
 
     # Personalizar las etiquetas de los ejes con la varianza explicada
     fig.update_layout(scene=dict(
@@ -125,8 +173,3 @@ try:
 
 except FileNotFoundError:
     st.error(f"El archivo '{file_path}' no se encontró. Por favor, súbelo al repositorio.")
-
-
-
-
-
