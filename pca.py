@@ -32,22 +32,16 @@ try:
     # Crear un objeto go.Figure
     fig = go.Figure()
 
-    # Añadir los puntos al gráfico con mayor tamaño y contorno más marcado
+    # Añadir los puntos al gráfico
     fig.add_trace(go.Scatter3d(
         x=projected_df['PC1'],
         y=projected_df['PC2'],
         z=projected_df['PC3'],
         mode='markers+text',
-        marker=dict(
-            size=8,  # Aumentar el tamaño de los puntos
-            color=projected_df['PC1'],  # Usar el valor de PC1 como color
-            colorscale='Viridis',  # Escala de colores
-            opacity=1,  # Opacidad completa
-            line=dict(width=2, color='black')  # Borde negro para resaltar los puntos
-        ),
+        marker=dict(size=5, color=projected_df['PC1'], opacity=0.8),
         text=projected_df['type-of-reactor'],
         textposition='top center',
-        textfont=dict(size=10, family='sans-serif', color='black'),  # Etiquetas con texto más grande y color oscuro
+        textfont=dict(size=10),
         name='Samples'
     ))
 
@@ -113,7 +107,7 @@ try:
         "S input per day": "S input"
     }
 
-    # Agregar los vectores de carga (loadings) con flechas y etiquetas con carteles
+    # Agregar los vectores de carga (loadings) con leyenda seleccionable y etiquetas
     for i, variable in enumerate(filtered_columns):
         vector = loadings_scaled[data.columns.get_loc(variable), :]  # Obtener el vector escalado
 
@@ -122,33 +116,34 @@ try:
             x=[0, vector[0]],
             y=[0, vector[1]],
             z=[0, vector[2]],
-            mode='lines+text',
-            line=dict(color='purple', width=2, dash='solid'),
+            mode='lines',
+            line=dict(color='purple', width=1.5),
             name=label_mapping.get(variable, variable),  # Usar el nombre mapeado o el original
             legendgroup=variable,  # Usar el mismo grupo para líneas y texto
             showlegend=True
         ))
 
-        # Dibujar la punta de la flecha (simulando la flecha en la punta) usando líneas adicionales
-        arrow_size = 0.3  # Ajuste para el tamaño de la "flecha"
+        # Dibujar la punta del vector
         fig.add_trace(go.Scatter3d(
-            x=[vector[0], vector[0] + arrow_size * vector[0]],
-            y=[vector[1], vector[1] + arrow_size * vector[1]],
-            z=[vector[2], vector[2] + arrow_size * vector[2]],
-            mode='lines',
-            line=dict(color='purple', width=3),
+            x=[vector[0]],
+            y=[vector[1]],
+            z=[vector[2]],
+            mode='markers',
+            marker=dict(size=3, color='purple', symbol='circle', opacity=0.8),
+            name=label_mapping.get(variable, variable),  # Usar el nombre mapeado o el original
+            legendgroup=variable,  # Usar el mismo grupo para líneas y texto
             showlegend=False
         ))
 
-        # Añadir el nombre del vector con un cartel
+        # Añadir el nombre del vector en la punta
         fig.add_trace(go.Scatter3d(
             x=[vector[0]],
             y=[vector[1]],
             z=[vector[2]],
             mode='text',
             text=[label_mapping.get(variable, variable)],  # Usar el nombre mapeado o el original
-            textposition='bottom center',
-            textfont=dict(size=10, family='sans-serif'),  # Ajustar la tipografía
+            textposition='top left',
+            textfont=dict(size=8),
             legendgroup=variable,  # Usar el mismo grupo para líneas y texto
             showlegend=False
         ))
