@@ -129,15 +129,14 @@ try:
             showlegend=True
         ))
 
-        # Dibujar la punta de la flecha (simulando la flecha en la punta)
+        # Dibujar la punta de la flecha (simulando la flecha en la punta) usando líneas adicionales
+        arrow_size = 0.3  # Ajuste para el tamaño de la "flecha"
         fig.add_trace(go.Scatter3d(
-            x=[vector[0]],
-            y=[vector[1]],
-            z=[vector[2]],
-            mode='markers',
-            marker=dict(size=6, color='purple', symbol='triangle-up', opacity=0.8),  # Usar símbolo de triángulo para la flecha
-            name=label_mapping.get(variable, variable),  # Usar el nombre mapeado o el original
-            legendgroup=variable,  # Usar el mismo grupo para líneas y texto
+            x=[vector[0], vector[0] + arrow_size * vector[0]],
+            y=[vector[1], vector[1] + arrow_size * vector[1]],
+            z=[vector[2], vector[2] + arrow_size * vector[2]],
+            mode='lines',
+            line=dict(color='purple', width=3),
             showlegend=False
         ))
 
@@ -166,4 +165,5 @@ try:
 
 except FileNotFoundError:
     st.error(f"El archivo '{file_path}' no se encontró. Por favor, súbelo al repositorio.")
+
 
