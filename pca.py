@@ -60,7 +60,7 @@ try:
             marker=dict(size=5, color=color, opacity=0.8),
             text=subset['type-of-reactor'],
             textposition='top center',
-            textfont=dict(size=10, color='white', family='Arial', bold=True),
+            textfont=dict(size=10, color='white', family='Arial Black'),  # Usar Arial Black para negrita
             name=reactor_type
         ))
 
@@ -179,4 +179,5 @@ try:
 
 except FileNotFoundError:
     st.error(f"El archivo '{file_path}' no se encontró. Por favor, súbelo al repositorio.")
+
 
