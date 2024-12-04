@@ -117,7 +117,7 @@ try:
     for i, variable in enumerate(filtered_columns):
         vector = loadings_scaled[data.columns.get_loc(variable), :]  # Obtener el vector escalado
 
-        # Dibujar los vectores como flechas
+        # Dibujar los vectores como líneas
         fig.add_trace(go.Scatter3d(
             x=[0, vector[0]],
             y=[0, vector[1]],
@@ -135,7 +135,7 @@ try:
             y=[vector[1]],
             z=[vector[2]],
             mode='markers',
-            marker=dict(size=6, color='purple', symbol='arrow-bar-up', opacity=0.8),
+            marker=dict(size=6, color='purple', symbol='triangle-up', opacity=0.8),  # Usar símbolo de triángulo para la flecha
             name=label_mapping.get(variable, variable),  # Usar el nombre mapeado o el original
             legendgroup=variable,  # Usar el mismo grupo para líneas y texto
             showlegend=False
@@ -166,3 +166,4 @@ try:
 
 except FileNotFoundError:
     st.error(f"El archivo '{file_path}' no se encontró. Por favor, súbelo al repositorio.")
+
