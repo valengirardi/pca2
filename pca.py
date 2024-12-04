@@ -146,19 +146,6 @@ try:
             showlegend=False
         ))
 
-        # Añadir el nombre del vector con un ligero desplazamiento
-        fig.add_trace(go.Scatter3d(
-            x=[vector[0] * 1.1],  # Desplazar ligeramente el texto
-            y=[vector[1] * 1.1],
-            z=[vector[2] * 1.1],
-            mode='text',
-            text=[label_mapping.get(variable, variable)],  # Usar el nombre mapeado o el original
-            textposition='top left',
-            textfont=dict(size=8, color='purple'),
-            legendgroup=variable,  # Usar el mismo grupo para líneas y texto
-            showlegend=False
-        ))
-
     # Personalizar las etiquetas de los ejes con la varianza explicada
     fig.update_layout(scene=dict(
         xaxis_title=f'PC1 ({pca.explained_variance_ratio_[0]:.2%})',
