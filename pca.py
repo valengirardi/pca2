@@ -32,7 +32,7 @@ try:
     # Normalizar valores de 'type-of-reactor'
     projected_df['type-of-reactor'] = projected_df['type-of-reactor'].str.strip().str.lower()
 
-    # Diccionario de colores
+    # Diccionario de colores exactos que solicitaste
     color_map = {
         'type1': '#ffbf50',
         'type2': '#c7519c',
@@ -40,11 +40,14 @@ try:
         'type4': '#1283b2'
     }
 
-    # Mapear colores y usar un color predeterminado para valores no encontrados
-    projected_df['color'] = projected_df['type-of-reactor'].map(color_map).fillna('#808080')  # Gris por defecto
+    # Mapear colores y manejar valores no encontrados
+    projected_df['color'] = projected_df['type-of-reactor'].map(color_map)
 
-    # Revisar registros con color faltante
-    st.write("Registros con mapeo de color faltante:", projected_df[projected_df['color'] == '#808080'])
+    # Verificar si hay valores no mapeados
+    missing_colors = projected_df[projected_df['color'].isna()]
+    if not missing_colors.empty:
+        st.error("Hay registros con tipos de reactor no mapeados. Por favor revisa:")
+        st.write(missing_colors)
 
     # Crear un objeto go.Figure
     fig = go.Figure()
@@ -60,7 +63,7 @@ try:
             marker=dict(size=5, color=color, opacity=0.8),
             text=subset['type-of-reactor'],
             textposition='top center',
-            textfont=dict(size=10, color='white', family='Arial Black'),  # Usar Arial Black para negrita
+            textfont=dict(size=10, color='white', family='Arial Black'),  # Estilo de texto en negrita
             name=reactor_type
         ))
 
@@ -179,5 +182,6 @@ try:
 
 except FileNotFoundError:
     st.error(f"El archivo '{file_path}' no se encontró. Por favor, súbelo al repositorio.")
+
 
 
