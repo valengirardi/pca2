@@ -32,7 +32,7 @@ try:
     # Definir colores específicos para ciertos puntos
     custom_colors = {
         "R3-1": "#ffbf50",
-        "R3-2": "#c7519c",
+        "R3-2": "#fc8728",  # Color naranja específico
         "R3-3": "#bcbd22",
         "R1": "#1283b2"
     }
@@ -46,17 +46,21 @@ try:
     # Crear un objeto go.Figure
     fig = go.Figure()
 
-    # Añadir los puntos al gráfico
-    fig.add_trace(go.Scatter3d(
-        x=projected_df['PC1'],
-        y=projected_df['PC2'],
-        z=projected_df['PC3'],
-        mode='markers',
-        marker=dict(size=5, color=colors, opacity=0.8),
-        hovertext=projected_df['type-of-reactor'],
-        hoverinfo="text",
-        name='Samples'
-    ))
+    # Añadir los puntos al gráfico con etiquetas para muestras específicas
+    for i, row in projected_df.iterrows():
+        label = row['type-of-reactor']
+        fig.add_trace(go.Scatter3d(
+            x=[row['PC1']],
+            y=[row['PC2']],
+            z=[row['PC3']],
+            mode='markers+text' if label in custom_colors else 'markers',
+            marker=dict(size=5, color=custom_colors.get(label, '#cccccc'), opacity=0.8),
+            text=label if label in custom_colors else None,
+            textposition="top center",
+            hoverinfo="text" if label not in custom_colors else "skip",  # Evitar duplicar hover en etiquetas visibles
+            name=label if label in custom_colors else 'Samples',
+            showlegend=label not in custom_colors  # Mostrar en leyenda solo muestras generales
+        ))
 
     # Lista de variables a filtrar
     variables_to_keep = [
