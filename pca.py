@@ -5,7 +5,7 @@ from sklearn.decomposition import PCA
 import plotly.graph_objects as go
 
 # Título de la aplicación
-st.title("Fig 6 (a) PCA")
+st.title("Fig. 6(a) - PCA")
 
 # Cargar los datos desde el archivo Excel
 file_path = "PCA.xlsx"  # Asegúrate de que el archivo esté presente en el repositorio
@@ -59,7 +59,8 @@ try:
             textposition="top center",
             hoverinfo="text" if label not in custom_colors else "skip",  # Evitar duplicar hover en etiquetas visibles
             name=label if label in custom_colors else 'Samples',
-            showlegend=label not in custom_colors  # Mostrar en leyenda solo muestras generales
+            textfont=dict(size=12, color=custom_colors.get(label, '#cccccc'), family="Arial", weight="bold"),  # Negrita en las etiquetas
+            showlegend=True  # Asegurar que las muestras estén en la leyenda
         ))
 
     # Lista de variables a filtrar
@@ -155,4 +156,5 @@ try:
 
 except FileNotFoundError:
     st.error(f"El archivo '{file_path}' no se encontró. Por favor, súbelo al repositorio.")
+
 
