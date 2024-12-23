@@ -5,7 +5,7 @@ from sklearn.decomposition import PCA
 import plotly.graph_objects as go
 
 # Título de la aplicación
-st.title("Gráfico PCA")
+st.title("Fig 6 (a) PCA")
 
 # Cargar los datos desde el archivo Excel
 file_path = "PCA.xlsx"  # Asegúrate de que el archivo esté presente en el repositorio
@@ -155,3 +155,4 @@ try:
 
 except FileNotFoundError:
     st.error(f"El archivo '{file_path}' no se encontró. Por favor, súbelo al repositorio.")
+
