@@ -51,11 +51,10 @@ try:
         x=projected_df['PC1'],
         y=projected_df['PC2'],
         z=projected_df['PC3'],
-        mode='markers+text',
+        mode='markers',
         marker=dict(size=5, color=colors, opacity=0.8),
-        text=projected_df['type-of-reactor'],
-        textposition='top center',
-        textfont=dict(size=10, color=colors),  # Aplicar los mismos colores a las etiquetas
+        hovertext=projected_df['type-of-reactor'],
+        hoverinfo="text",
         name='Samples'
     ))
 
@@ -69,17 +68,10 @@ try:
         'S input per day',
         'Methane in biogas (%)',
         'Carbon dioxide in biogas (%)',
-        'Uncultured (Family: Anaerolineaceae)',
         'Aminobacterium',
         'Sporanaerobacter',
-        'Syntrophomonas',
-        'Syner-01',
         'Christensenellaceae_R-7_group',
-        'EBM-39',
-        'Sphaerochaeta',
-        'Proteiniphilum',
         'Thermovirga',
-        'Pseudoramibacter',
         'Dethiosulfovibrio',
         'SEEP-SRB1',
         'Desulfobulbus',
@@ -93,7 +85,6 @@ try:
         'Methanobacterium',
         'Methanoculleus',
         'Methanocalculus',
-        'RumEn_M2',
         'Methanimicrococcus',
     ]
 
@@ -108,15 +99,15 @@ try:
     # Diccionario para renombrar las etiquetas (opcional)
     label_mapping = {
         "Amount of Fe (instantáneo)": "Fe³⁺ addition",
-        "Sulfide concentration": "H₂Sliq/HS⁻liq",
-        "Sulfate concentration ": "SO₄²⁻",
-        "Hydrogen sulfide concentration": "H₂Sg",
-        "Methane in biogas (%)": "CH₄",
-        "Carbon dioxide in biogas (%)": "CO₂",
+        "Sulfide concentration": "[H₂Sliq/HS⁻liq]",
+        "Sulfate concentration ": "[SO₄²⁻]",
+        "Hydrogen sulfide concentration": "[H₂Sg]",
+        "Methane in biogas (%)": "%CH₄ in biogas",
+        "Carbon dioxide in biogas (%)": "%CO₂ in biogas",
         "S input per day": "S input"
     }
 
-    # Agregar los vectores de carga (loadings) con leyenda seleccionable y etiquetas
+    # Agregar los vectores de carga (loadings) con etiquetas visibles solo al pasar el cursor
     for i, variable in enumerate(filtered_columns):
         vector = loadings_scaled[data.columns.get_loc(variable), :]  # Obtener el vector escalado
 
@@ -127,21 +118,25 @@ try:
             z=[0, vector[2]],
             mode='lines',
             line=dict(color='purple', width=1.5),
+            hovertext=label_mapping.get(variable, variable),  # Nombre del vector
+            hoverinfo="text",  # Mostrar solo el texto al pasar el cursor
             name=label_mapping.get(variable, variable),  # Usar el nombre mapeado o el original
             legendgroup=variable,  # Usar el mismo grupo para líneas y texto
             showlegend=True
         ))
 
-        # Dibujar la punta del vector
+        # Dibujar la punta del vector con etiqueta visible solo al pasar el cursor
         fig.add_trace(go.Scatter3d(
             x=[vector[0]],
             y=[vector[1]],
             z=[vector[2]],
             mode='markers',
-            marker=dict(size=2, color='purple', symbol='circle', opacity=0.8),
+            marker=dict(size=4, color='purple', symbol='circle', opacity=0.8),
+            hovertext=label_mapping.get(variable, variable),  # Nombre del vector
+            hoverinfo="text",  # Mostrar solo el texto al pasar el cursor
             name=label_mapping.get(variable, variable),  # Usar el nombre mapeado o el original
             legendgroup=variable,  # Usar el mismo grupo para líneas y texto
-            showlegend=False
+            showlegend=False  # Evitar duplicar leyendas
         ))
 
     # Personalizar las etiquetas de los ejes con la varianza explicada
