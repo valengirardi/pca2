@@ -31,10 +31,10 @@ try:
 
     # Definir colores específicos para ciertos puntos
     custom_colors = {
-        "R3-1": "#ffbf50",
-        "R3-2": "#fc8728",  # Color naranja específico
-        "R3-3": "#bcbd22",
-        "R1": "#1283b2"
+        "R3-41": "#ffbf50",
+        "R3-82": "#fc8728",  # Color naranja específico
+        "R3-117": "#bcbd22",
+        "R1-98": "#1283b2"
     }
 
     # Crear una lista de colores basada en el tipo de reactor
