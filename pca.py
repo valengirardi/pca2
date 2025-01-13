@@ -109,7 +109,31 @@ try:
         "Hydrogen sulfide concentration": "[H₂Sg]",
         "Methane in biogas (%)": "%CH₄ in biogas",
         "Carbon dioxide in biogas (%)": "%CO₂ in biogas",
-        "S input per day": "S input"
+        "S input per day": "S input",
+        'Christensenellaceae_R-7_group': 'Christensenellaceae R-7 group',
+        'Candidatus_Methanoplasma': 'Candidatus Methanoplasma'
+    }
+
+    # Lista de etiquetas que deben estar en itálica
+    italic_labels = {
+        'Aminobacterium',
+        'Sporanaerobacter',
+        'Christensenellaceae R-7 group',
+        'Thermovirga',
+        'Dethiosulfovibrio',
+        'SEEP-SRB1',
+        'Desulfobulbus',
+        'Desulfobotulus',
+        'Desulfomicrobium',
+        'Desulfocurvus',
+        'Desulfuromonas',
+        'Methanobrevibacter',
+        'Methanospirillum',
+        'Candidatus Methanoplasma',
+        'Methanobacterium',
+        'Methanoculleus',
+        'Methanocalculus',
+        'Methanimicrococcus'
     }
 
     # Agregar los vectores de carga (loadings) con etiquetas visibles solo al pasar el cursor
@@ -135,12 +159,17 @@ try:
             x=[vector[0]],
             y=[vector[1]],
             z=[vector[2]],
-            mode='markers',
+            mode='markers+text',
             marker=dict(size=4, color='purple', symbol='circle', opacity=0.8),
             hovertext=label_mapping.get(variable, variable),  # Nombre del vector
             hoverinfo="text",  # Mostrar solo el texto al pasar el cursor
             name=label_mapping.get(variable, variable),  # Usar el nombre mapeado o el original
             legendgroup=variable,  # Usar el mismo grupo para líneas y texto
+            textfont=dict(
+                size=10,
+                family="Arial",
+                style="italic" if label_mapping.get(variable, variable) in italic_labels else "normal"
+            ),
             showlegend=False  # Evitar duplicar leyendas
         ))
 
